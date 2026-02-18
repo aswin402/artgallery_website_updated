@@ -12,7 +12,7 @@ export async function getAllArts(): Promise<Art[]> {
     if (!res.ok) {
       throw new Error("Failed to fetch arts");
     }
-
+    logger.info("Fetching artworks")
     return await res.json();
   } catch (error) {
     logger.error("getAllArts failed", error);
@@ -30,7 +30,7 @@ export async function getArtById(id: number): Promise<Art> {
     if (!res.ok) {
       throw new Error("Failed to fetch art");
     }
-
+    logger.info(`Fetching art with id ${id}`)
     return await res.json();
   } catch (error) {
     logger.error(`getArtById failed (id: ${id})`, error);
@@ -50,7 +50,7 @@ export async function createArt(art: Omit<Art, "id">): Promise<Art> {
     if (!res.ok) {
       throw new Error("Failed to create art");
     }
-
+    logger.info(`Created art with id ${art}`)
     return await res.json();
   } catch (error) {
     logger.error("createArt failed", error);
@@ -68,6 +68,7 @@ export async function deleteArt(id: number): Promise<void> {
     if (!res.ok) {
       throw new Error("Failed to delete art");
     }
+    logger.info(`Deleted art with id ${id}`)
   } catch (error) {
     logger.error(`deleteArt failed (id: ${id})`, error);
     throw error;
@@ -86,7 +87,7 @@ export async function updateArt(art: Art): Promise<Art> {
     if (!res.ok) {
       throw new Error("Failed to update art");
     }
-
+    logger.info(`Updated art with id ${art.id}`)
     return await res.json();
   } catch (error) {
     logger.error(`updateArt failed (id: ${art.id})`, error);
