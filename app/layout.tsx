@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ThemeProvider } from "@/components/shared/theme-provider";
+import DustBackground from "@/components/shared/DustBackground";
+import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 const outfit = Outfit({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = Geist({
@@ -27,14 +31,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={outfit.variable}>
+    <ThemeProvider
+             attribute="class"
+             defaultTheme="system"
+             enableSystem
+             disableTransitionOnChange
+             >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+        > 
+          <DustBackground />
+                   <Navbar />
         <Providers>
            {children}
       </Providers>
-                 
-      </body>
+            <Footer />     
+        </body>
+             </ThemeProvider>
     </html>
   );
 }
