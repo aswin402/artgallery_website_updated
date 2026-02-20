@@ -13,3 +13,8 @@ export interface AlertProps {
   description?: string;
   variant?: AlertVariant;
 }
+
+export type CreateArtInput = {
+  data: Omit<Art, "id">;
+  image?: File;
+};

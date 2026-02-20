@@ -39,18 +39,31 @@ export async function getArtById(id: number): Promise<Art> {
 }
 
 //createArt==============================================================
-export async function createArt(art: Omit<Art, "id">): Promise<Art> {
+export async function createArt(
+  data: Omit<Art, "id">,
+  image?: File
+): Promise<Art> {
   try {
+    const formData = new FormData();
+
+    formData.append("artname", data.artname);
+    formData.append("artist", data.artist);
+    formData.append("price", String(data.price));
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     const res = await fetch(`${api}/art`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(art),
+      body: formData,
     });
 
     if (!res.ok) {
       throw new Error("Failed to create art");
     }
-    logger.info(`Created art with id ${art}`)
+
+    logger.info(`Created art: ${data.artname}`);
     return await res.json();
   } catch (error) {
     logger.error("createArt failed", error);
@@ -76,21 +89,25 @@ export async function deleteArt(id: number): Promise<void> {
 }
 
 //updateArt==============================================================
-export async function updateArt(art: Art): Promise<Art> {
+export async function updateArt(
+  id: number,
+  data: Partial<Art>
+): Promise<Art> {
   try {
-    const res = await fetch(`${api}/art/${art.id}`, {
+    const res = await fetch(`${api}/art/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(art),
+      body: JSON.stringify(data),
     });
 
     if (!res.ok) {
       throw new Error("Failed to update art");
     }
-    logger.info(`Updated art with id ${art.id}`)
+
+    logger.info(`Updated art with id ${id}`);
     return await res.json();
   } catch (error) {
-    logger.error(`updateArt failed (id: ${art.id})`, error);
+    logger.error(`updateArt failed (id: ${id})`, error);
     throw error;
   }
 }

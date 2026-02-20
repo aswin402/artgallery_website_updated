@@ -1,55 +1,81 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAllArts, deleteArt, updateArt, getArtById, createArt } from "../artworks.service";
-import { Art } from "../types";
+import {
+  getAllArts,
+  deleteArt,
+  updateArt,
+  getArtById,
+  createArt,
+} from "../artworks.service";
+import { Art, CreateArtInput } from "../types";
+import { artKeys } from "../art.queryKeys";
 
-//getAllArts====================================
+/* ================= GET ALL ================= */
 export const useArtworks = () =>
   useQuery({
-    queryKey: ["arts"],
+    queryKey: artKeys.lists(),
     queryFn: getAllArts,
   });
 
-//getArtById====================================
+/* ================= GET BY ID ================= */
 export const useArtById = (id: number) =>
   useQuery({
-    queryKey: ["art", id],
+    queryKey: artKeys.detail(id),
     queryFn: () => getArtById(id),
     enabled: !!id,
   });
 
-//createArts====================================
+/* ================= CREATE ================= */
 export const useCreateArt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createArt,
+    mutationFn: ({ data, image }: CreateArtInput) =>
+      createArt(data, image),
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["arts"] });
+      queryClient.invalidateQueries({ queryKey: artKeys.all });
     },
   });
 };
 
-
-//DeleteArts====================================
+/* ================= DELETE ================= */
 export const useDeleteArt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteArt,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["arts"] });
+    mutationFn: (id: number) => deleteArt(id),
+
+    onSuccess: (_, id) => {
+      // Optimistic removal from cache
+      queryClient.setQueryData<Art[]>(
+        artKeys.lists(),
+        (old) => old?.filter((art) => art.id !== id) ?? []
+      );
     },
   });
 };
 
-//UpdateArts====================================
+/* ================= UPDATE ================= */
 export const useUpdateArt = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (art: Art) => updateArt(art),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["arts"] });
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<Art>;
+    }) => updateArt(id, data),
+
+    onSuccess: (updatedArt) => {
+      queryClient.setQueryData<Art[]>(
+        artKeys.lists(),
+        (old) =>
+          old?.map((art) =>
+            art.id === updatedArt.id ? updatedArt : art
+          ) ?? []
+      );
     },
   });
 };

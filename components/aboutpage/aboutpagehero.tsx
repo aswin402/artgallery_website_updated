@@ -34,7 +34,7 @@ export default function AboutPageHero() {
      className="rounded-full px-6 py-6 text-base font-medium flex items-center gap-2"
      asChild
    >
-     <Link href="/publishart">
+     <Link href="/publish-art">
        <span>Get Started</span>
        <ArrowUpRight className="h-5 w-5" />
      </Link>
